@@ -7,16 +7,18 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 from recommender import GameRecommender
 from steam_api import SteamAPI
 
-app = Flask(__name__, static_url_path='/assets', static_folder='assets')
+ASSETS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets')
+app = Flask(__name__, static_url_path='/assets', static_folder=ASSETS_DIR)
 
 # Initialize the recommender
 print("Loading ML model...")
-recommender = GameRecommender(model_path='model/model.pkl')
+MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'model', 'model.pkl')
+recommender = GameRecommender(model_path=MODEL_PATH)
 steam_api = SteamAPI()
 
 @app.route('/')
 def index():
-    return send_from_directory('.', 'index.html')
+    return send_from_directory(os.path.dirname(os.path.abspath(__file__)), 'index.html')
 
 @app.route('/api/recommend', methods=['POST'])
 def get_recommendations():
