@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus | Steam Recommender</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #051417; 
+            --surface: rgba(10, 30, 35, 0.6);
+            --primary: #00e5ff; 
+            --primary-hover: #00b8cc;
+            --btn-grad: linear-gradient(135deg, #00e5ff 0%, #0077ff 100%);
+            --text-main: #ffffff;
+            --text-muted: #a0b6b8;
+            --glass-border: rgba(0, 229, 255, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            background-image: url('assets/bg.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(5,20,23,0.92) 0%, rgba(10,50,60,0.75) 50%, rgba(5,20,23,0.92) 100%);
+            z-index: -1;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        nav {
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(5, 20, 23, 0.5);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0; z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Poppins', sans-serif; font-size: 1.6rem; font-weight: 800;
+            display: flex; align-items: center; gap: 12px; color: white;
+            text-shadow: 0 0 15px rgba(0, 229, 255, 0.4); cursor: pointer;
+        }
+
+        .logo svg { width: 30px; height: 30px; fill: var(--primary); filter: drop-shadow(0 0 5px rgba(0, 229, 255, 0.5)); }
+
+        .nav-actions { display: flex; align-items: center; gap: 15px; }
+        
+        #userStatus { font-weight: 600; color: var(--primary); font-size: 0.95rem; }
+
+        .login-btn-nav {
+            background: linear-gradient(135deg, #171a21, #2a475e);
+            border: 1px solid #66c0f4;
+            color: #66c0f4;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+        .login-btn-nav:hover {
+            background: linear-gradient(135deg, #2a475e, #66c0f4);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 6px 15px rgba(102, 192, 244, 0.5);
+            transform: translateY(-2px);
+        }
+
+        main {
+            flex: 1; display: flex; flex-direction: column; align-items: center;
+            padding: 50px 20px; max-width: 1400px; margin: 0 auto; width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 60px;
+            max-width: 800px;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .hero h1 {
+            font-family: 'Poppins', sans-serif; font-size: 3.5rem; margin-bottom: 15px; line-height: 1.2;
+            background: linear-gradient(90deg, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .hero p { color: var(--text-muted); font-size: 1.2rem; margin-bottom: 40px; }
+
+        .search-box {
+            display: flex; gap: 15px; background: var(--surface); padding: 10px;
+            border-radius: 16px; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 600px; margin: 0 auto;
+        }
+        
+        .search-box input {
+            flex: 1; padding: 15px 20px; background: rgba(0,0,0,0.3); border: 1px solid transparent; border-radius: 10px;
+            color: white; font-size: 1.05rem; transition: all 0.3s; outline: none;
+        }
+        
+        .search-box input:focus { border-color: var(--primary); background: rgba(0,0,0,0.5); }
+        .search-box button {
+            background: var(--btn-grad); color: white; border: none; padding: 0 35px; border-radius: 10px;
+            font-weight: 700; font-size: 1.05rem; cursor: pointer; transition: all 0.3s;
+        }
+        .search-box button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0, 229, 255, 0.4); }
+
+        .content-area { width: 100%; animation: slideUp 1s ease-out; }
+
+        .section-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;
+            border-bottom: 1px solid var(--glass-border); padding-bottom: 15px;
+        }
+
+        .section-header h2 { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1.8rem; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+
+        .card {
+            background: var(--surface); border: 1px solid var(--glass-border); border-radius: 16px;
+            overflow: hidden; transition: all 0.3s; cursor: pointer; position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .card::before {
+            content: 'View Details'; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 229, 255, 0.85); color: #000; font-weight: 800; font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem; display: flex; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; z-index: 10;
+        }
+
+        .card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0, 229, 255, 0.15); border-color: var(--primary); }
+        .card:hover::before { opacity: 1; }
+        .card img { width: 100%; height: 140px; object-fit: cover; border-bottom: 1px solid var(--glass-border); }
+        .card-content { padding: 20px; }
+        .card-title { font-family: 'Poppins', sans-serif; font-weight: 700; margin-bottom: 8px; font-size: 1.15rem; }
+        .card-badge { 
+            background: rgba(0, 229, 255, 0.15); color: var(--primary); padding: 5px 10px; border-radius: 6px; 
+            font-size: 0.8rem; font-weight: 700; display: inline-block; border: 1px solid rgba(0, 229, 255, 0.3);
+        }
+
+        .loader {
+            display: none; margin: 50px auto; border: 4px solid rgba(255,255,255,0.05); border-radius: 50%;
+            border-top: 4px solid var(--primary); width: 50px; height: 50px; animation: spin 0.8s linear infinite;
+        }
+
+        /* Login Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000;
+        }
+
+        .login-modal-box {
+            background: #0a1e23; border: 1px solid var(--glass-border); border-radius: 20px; width: 90%; max-width: 450px;
+            padding: 40px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.8); position: relative; animation: slideUp 0.3s;
+        }
+
+        .login-modal-box h2 { font-family: 'Poppins', sans-serif; margin-bottom: 10px; }
+        .login-modal-box p { color: var(--text-muted); margin-bottom: 25px; font-size: 0.9rem; }
+        .login-modal-box input {
+            width: 100%; padding: 15px; background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border);
+            border-radius: 10px; color: white; margin-bottom: 20px; outline: none; font-size: 1rem;
+        }
+        .login-modal-box input:focus { border-color: var(--primary); }
+        .btn-full { background: var(--btn-grad); color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: 700; font-size: 1.05rem; cursor: pointer; }
+
+        /* Details Modal */
+        .modal {
+            background: #0a1e23; border: 1px solid var(--glass-border); border-radius: 20px; width: 90%; max-width: 650px;
+            text-align: left; box-shadow: 0 20px 50px rgba(0,0,0,0.8); position: relative; overflow: hidden; animation: slideUp 0.3s;
+        }
+
+        .close-modal {
+            position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.6); border: none; color: white;
+            font-size: 1.5rem; cursor: pointer; width: 35px; height: 35px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; z-index: 10; transition: background 0.2s;
+        }
+        .close-modal:hover { background: rgba(0, 229, 255, 0.5); }
+
+        .btn-action {
+            background: linear-gradient(135deg, #00e5ff 0%, #0055ff 100%);
+            color: white; border: none; padding: 18px; width: 100%;
+            border-radius: 12px; font-size: 1.15rem; font-weight: 800; cursor: pointer; display: flex;
+            justify-content: center; align-items: center; gap: 12px; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 30px rgba(0, 229, 255, 0.3); text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            text-transform: uppercase; letter-spacing: 1px; position: relative; overflow: hidden;
+        }
+
+        .btn-action::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transform: skewX(-20deg); animation: shine 3s infinite;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-3px) scale(1.02); box-shadow: 0 15px 40px rgba(0, 229, 255, 0.6);
+            background: linear-gradient(135deg, #00ffff 0%, #0077ff 100%);
+        }
+
+        .btn-steam-login {
+            background: linear-gradient(to right, #75b022 5%, #588a1b 95%);
+            color: #d2efa9;
+            border: none; padding: 16px; width: 100%;
+            border-radius: 4px; font-size: 1.15rem; font-weight: 500; cursor: pointer; transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn-steam-login:hover {
+            background: linear-gradient(to right, #8ed629 5%, #6aa621 95%);
+            color: white; transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(117, 176, 34, 0.4);
+        }
+
+        .modal-body { padding: 25px; max-height: 60vh; overflow-y: auto; }
+        .modal-header-info { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .modal-rating-badge {
+            background: linear-gradient(135deg, #00e5ff, #0055ff); color: #fff; padding: 6px 14px; border-radius: 20px; 
+            font-weight: 700; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(0, 229, 255, 0.3);
+        }
+        .modal-section {
+            background: rgba(0, 20, 30, 0.5); border: 1px solid var(--glass-border); border-radius: 12px; padding: 18px; margin-bottom: 20px;
+        }
+        .modal-section h3 {
+            color: var(--primary); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px;
+            margin-bottom: 12px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(0, 229, 255, 0.1); padding-bottom: 8px;
+        }
+        .modal-desc-content { color: #c0d6d8; font-size: 0.95rem; line-height: 1.7; }
+        .modal-desc-content img { max-width: 100%; border-radius: 8px; margin: 10px 0; }
+        .modal-sysreq-content {
+            font-family: 'Consolas', monospace; font-size: 0.85rem; color: #a0b6b8; line-height: 1.6;
+            background: #050a0f; padding: 12px; border-radius: 8px; border: 1px solid #1a3035;
+        }
+
+        @keyframes shine { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo" onclick="location.reload()">
+            <svg viewBox="0 0 24 24"><path d="M11.979 0C5.353 0 0 5.373 0 12c0 4.148 2.115 7.828 5.342 10.024l3.411-4.908c-.062-.266-.101-.54-.101-.826 0-1.928 1.563-3.491 3.491-3.491.564 0 1.096.142 1.565.385l2.42-3.46c-.033-.189-.053-.383-.053-.584 0-1.928 1.563-3.491 3.491-3.491 1.929 0 3.492 1.563 3.492 3.491 0 1.929-1.563 3.492-3.492 3.492-1.85 0-3.366-1.442-3.483-3.264l-2.43 3.473c.184.441.288.927.288 1.439 0 1.928-1.563 3.491-3.491 3.491-1.929 0-3.492-1.563-3.492-3.491 0-.616.16-1.196.442-1.706l-3.328-4.786C1.728 12.396 1.728 12.203 1.728 12c0-5.656 4.595-10.251 10.251-10.251 5.656 0 10.251 4.595 10.251 10.251 0 5.656-4.595 10.251-10.251 10.251-.762 0-1.503-.085-2.22-.24l1.326-1.908c.287.051.585.078.894.078 4.704 0 8.523-3.819 8.523-8.523S16.683 3.477 11.979 3.477z"/></svg>
+            Nexus
+        </div>
+        <div class="nav-actions">
+            <span id="userStatus" style="color: #a0b6b8; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; font-weight: 500;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                Guest Mode
+            </span>
+            <button class="login-btn-nav" id="navLoginBtn" onclick="openLoginModal()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.979 0C5.366 0 0 5.362 0 11.979c0 4.606 2.616 8.592 6.46 10.596l3.39-4.898c-.104-.337-.16-.697-.16-1.071 0-1.921 1.558-3.48 3.48-3.48.337 0 .666.052.98.146l4.63-6.611c.01-.108.024-.216.024-.326 0-2.316-1.879-4.194-4.195-4.194-2.315 0-4.195 1.878-4.195 4.194 0 .332.047.653.125.961l-4.455 3.197c-.503-.231-1.06-.36-1.644-.36-2.186 0-3.958 1.772-3.958 3.958 0 2.187 1.772 3.959 3.958 3.959.98 0 1.87-.361 2.56-.957l4.873 3.375c3.676-1.636 6.273-5.323 6.273-9.593C24 5.362 18.634 0 11.979 0zm2.632 10.638l-4.63 6.612c-.22.61-.806 1.042-1.488 1.042-1.378 0-2.495-1.117-2.495-2.495 0-1.378 1.117-2.495 2.495-2.495.66 0 1.259.261 1.697.683l4.42-3.17c-.015-.098-.029-.196-.029-.297 0-1.83 1.484-3.315 3.314-3.315 1.83 0 3.314 1.485 3.314 3.315 0 1.83-1.484 3.314-3.314 3.314-.462 0-.9-.098-1.3-.274v-.001zm-3.13 6.666c0 .847-.687 1.534-1.534 1.534-.847 0-1.534-.687-1.534-1.534 0-.847.687-1.534 1.534-1.534.847 0 1.534.687 1.534 1.534z"/></svg>
+                Sign In
+            </button>
+        </div>
+    </nav>
+
+    <main>
+        <div class="hero">
+            <h1>Discover Your Next Obsession</h1>
+            <p>AI-powered game recommendations. Enter a game you love, and let our neural network scan the Steam catalog to find exactly what you should play next.</p>
+            <div class="search-box">
+                <input type="text" id="gameQuery" placeholder="e.g. Cyberpunk 2077, Hollow Knight..." autocomplete="off">
+                <button onclick="fetchRecommendations()">Search</button>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="section-header">
+                <h2 id="gridTitle">Trending on Steam</h2>
+            </div>
+            <div class="loader" id="loader"></div>
+            <div class="grid" id="mainGrid"></div>
+        </div>
+    </main>
+
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="login-modal-box">
+            <button class="close-modal" onclick="closeLoginModal()">&times;</button>
+            <svg style="width: 50px; fill: var(--primary); margin-bottom: 15px;" viewBox="0 0 24 24"><path d="M11.979 0C5.353 0 0 5.373 0 12c0 4.148 2.115 7.828 5.342 10.024l3.411-4.908c-.062-.266-.101-.54-.101-.826 0-1.928 1.563-3.491 3.491-3.491.564 0 1.096.142 1.565.385l2.42-3.46c-.033-.189-.053-.383-.053-.584 0-1.928 1.563-3.491 3.491-3.491 1.929 0 3.492 1.563 3.492 3.491 0 1.929-1.563 3.492-3.492 3.492-1.85 0-3.366-1.442-3.483-3.264l-2.43 3.473c.184.441.288.927.288 1.439 0 1.928-1.563 3.491-3.491 3.491-1.929 0-3.492-1.563-3.492-3.491 0-.616.16-1.196.442-1.706l-3.328-4.786C1.728 12.396 1.728 12.203 1.728 12c0-5.656 4.595-10.251 10.251-10.251 5.656 0 10.251 4.595 10.251 10.251 0 5.656-4.595 10.251-10.251 10.251-.762 0-1.503-.085-2.22-.24l1.326-1.908c.287.051.585.078.894.078 4.704 0 8.523-3.819 8.523-8.523S16.683 3.477 11.979 3.477z"/></svg>
+            <h2>Connect Steam Account</h2>
+            <p>Sync your library to filter out games you already own.</p>
+            <input type="text" id="steamIdInput" placeholder="Steam ID (e.g. 7656119...)">
+            <button class="btn-steam-login" onclick="handleLogin()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>
+                Secure Login
+            </button>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div class="modal-overlay" id="detailsModal">
+        <div class="modal">
+            <button class="close-modal" onclick="closeDetailsModal()">&times;</button>
+            <img id="modalImg" src="" style="width: 100%; height: 250px; object-fit: cover;">
+            <div class="modal-body">
+                <h2 id="modalTitle" style="font-family: 'Poppins'; margin-bottom: 5px; font-size: 1.8rem;"></h2>
+                
+                <div class="modal-header-info">
+                    <span id="modalDevs" style="color: var(--primary); font-weight: 600;"></span>
+                    <span id="modalRating" class="modal-rating-badge"></span>
+                </div>
+                
+                <div class="modal-section">
+                    <h3>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                        About This Game
+                    </h3>
+                    <div id="modalDesc" class="modal-desc-content"></div>
+                </div>
+                
+                <div class="modal-section">
+                    <h3>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/></svg>
+                        System Requirements
+                    </h3>
+                    <div id="modalSysReq" class="modal-sysreq-content"></div>
+                </div>
+                
+                <button class="btn-action" id="modalFindBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                    Find Similar Games
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSteamId = "";
+
+        window.onload = () => fetchPopular();
+
+        function openLoginModal() { document.getElementById('loginModal').style.display = 'flex'; }
+        function closeLoginModal() { document.getElementById('loginModal').style.display = 'none'; }
+        function closeDetailsModal() { document.getElementById('detailsModal').style.display = 'none'; }
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('loginModal')) closeLoginModal();
+            if (event.target == document.getElementById('detailsModal')) closeDetailsModal();
+        }
+
+        async function fetchPopular() {
+            document.getElementById('gridTitle').innerText = "Trending on Steam";
+            const loader = document.getElementById('loader');
+            const grid = document.getElementById('mainGrid');
+            grid.innerHTML = ""; loader.style.display = "block";
+            try {
+                const res = await fetch('/api/popular');
+                const data = await res.json();
+                loader.style.display = "none";
+                if (data.recommendations) renderGrid(data.recommendations, false);
+            } catch (err) { loader.style.display = "none"; }
+        }
+
+        async function handleLogin() {
+            const input = document.getElementById('steamIdInput').value.trim();
+            if (!input) return alert("Please enter a valid Steam ID");
+
+            currentSteamId = input;
+            document.getElementById('userStatus').innerHTML = `
+                <span style="color: #00e5ff; display: flex; align-items: center; gap: 6px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    Connected: ${input}
+                </span>
+            `;
+            document.getElementById('navLoginBtn').style.display = 'none';
+            closeLoginModal();
+            
+            document.getElementById('gridTitle').innerText = "Your Library";
+            const loader = document.getElementById('loader');
+            const grid = document.getElementById('mainGrid');
+            grid.innerHTML = ""; loader.style.display = "block";
+
+            try {
+                const res = await fetch(`/api/library?steamId=${input}`);
+                const data = await res.json();
+                loader.style.display = "none";
+                if (data.error) grid.innerHTML = `<p style="color:#00e5ff;">${data.error}</p>`;
+                else if (data.library && data.library.length > 0) renderGrid(data.library, false);
+                else grid.innerHTML = `<p>No games found in this library. Note: Library must be public.</p>`;
+            } catch (err) {
+                loader.style.display = "none";
+                grid.innerHTML = `<p style="color:#00e5ff;">Connection error</p>`;
+            }
+        }
+
+        async function fetchRecommendations(forcedQuery = null, forcedAppId = null) {
+            const query = forcedQuery || document.getElementById('gameQuery').value.trim();
+            if (!query) return;
+
+            if (forcedQuery) document.getElementById('gameQuery').value = forcedQuery;
+
+            document.getElementById('gridTitle').innerText = `Recommendations for "${query}"`;
+            const loader = document.getElementById('loader');
+            const grid = document.getElementById('mainGrid');
+            grid.innerHTML = ""; loader.style.display = "block";
+            
+            // Smooth scroll to results
+            document.getElementById('gridTitle').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            try {
+                const res = await fetch('/api/recommend', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ steamId: currentSteamId, gameQuery: query, appId: forcedAppId })
+                });
+                const data = await res.json();
+                loader.style.display = "none";
+
+                if (data.error) {
+                    grid.innerHTML = `<p style="color:#00e5ff; font-size: 1.2rem; grid-column: 1/-1;">Game not found. Try another search.</p>`;
+                } else if (data.recommendations) {
+                    renderGrid(data.recommendations, true);
+                }
+            } catch (err) {
+                loader.style.display = "none";
+            }
+        }
+
+        function renderGrid(items, showMatch) {
+            const grid = document.getElementById('mainGrid');
+            grid.innerHTML = "";
+            items.forEach((item, i) => {
+                const imgUrl = `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${item.appId}/header.jpg`;
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.animationDelay = `${i * 0.05}s`;
+                
+                card.onclick = () => openGameDetails(item.name, item.appId);
+                
+                let contentHTML = `<div class="card-content"><div class="card-title">${item.name}</div>`;
+                if (showMatch && item.match && item.match !== "Popular") {
+                    contentHTML += `<span class="card-badge">${item.match} Match</span>`;
+                }
+                contentHTML += `</div>`;
+                
+                card.innerHTML = `
+                    <img src="${imgUrl}" alt="${item.name}" onerror="this.src='https://community.cloudflare.steamstatic.com/public/images/signinthroughsteam/sits_01.png'">
+                    ${contentHTML}
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        async function openGameDetails(name, appId) {
+            const modal = document.getElementById('detailsModal');
+            document.getElementById('modalTitle').innerText = name;
+            document.getElementById('modalImg').src = `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${appId}/header.jpg`;
+            
+            document.getElementById('modalDesc').innerHTML = "Loading description from Steam...";
+            document.getElementById('modalSysReq').innerHTML = "Loading...";
+            document.getElementById('modalRating').innerText = "Loading Rating...";
+            document.getElementById('modalDevs').innerText = "";
+            
+            modal.style.display = 'flex';
+            
+            document.getElementById('modalFindBtn').onclick = () => {
+                closeDetailsModal();
+                fetchRecommendations(name, appId);
+            };
+
+            try {
+                const res = await fetch(`/api/game_details?appId=${appId}`);
+                const data = await res.json();
+                if (!data.error) {
+                    document.getElementById('modalDesc').innerHTML = data.desc;
+                    document.getElementById('modalSysReq').innerHTML = data.sysReq;
+                    document.getElementById('modalRating').innerText = data.rating;
+                    document.getElementById('modalDevs').innerText = data.devs;
+                }
+            } catch (err) {}
+        }
+
+        document.getElementById('gameQuery').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') fetchRecommendations();
+        });
+    </script>
+</body>
+</html>
