@@ -119,6 +119,7 @@ def get_game_details():
         req_min = "System requirements not specified."
         desc = "No description available."
         devs = "Unknown"
+        genres = ""
         price_overview = None
         movie = None
         
@@ -129,6 +130,8 @@ def get_game_details():
                 req_min = sys_req['minimum']
             desc = data.get('short_description', desc)
             devs = ", ".join(data.get('developers', []))
+            if 'genres' in data:
+                genres = ", ".join([g['description'] for g in data['genres']])
             
             # Fetch Price Overview
             if 'price_overview' in data:
@@ -155,6 +158,7 @@ def get_game_details():
             "desc": desc,
             "rating": rating,
             "devs": devs,
+            "genres": genres,
             "price": price_overview,
             "movie": movie
         })

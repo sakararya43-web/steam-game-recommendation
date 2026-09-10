@@ -345,6 +345,7 @@
                 <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px;">
                     <span id="modalRating" class="modal-rating-badge" style="font-size: 0.9rem; padding: 6px 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);"></span>
                     <span id="modalDevs" class="modal-rating-badge" style="font-size: 0.9rem; padding: 6px 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--primary);"></span>
+                    <span id="modalGenres" class="modal-rating-badge" style="font-size: 0.9rem; padding: 6px 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #a0b6b8; display: none;"></span>
                     <span id="modalPrice" class="modal-rating-badge" style="font-size: 0.9rem; padding: 6px 12px; background: rgba(0, 229, 255, 0.15); border: 1px solid var(--primary); display: none; font-weight: 700; box-shadow: 0 0 10px rgba(0,229,255,0.3);"></span>
                 </div>
                 
@@ -546,6 +547,8 @@
             document.getElementById('modalSysReq').innerHTML = "Loading...";
             document.getElementById('modalRating').innerText = "Loading Rating...";
             document.getElementById('modalDevs').innerText = "";
+            document.getElementById('modalGenres').style.display = "none";
+            document.getElementById('modalGenres').innerText = "";
             
             const priceBadge = document.getElementById('modalPrice');
             priceBadge.style.display = "none";
@@ -570,6 +573,11 @@
                     document.getElementById('modalSysReq').innerHTML = data.sysReq;
                     document.getElementById('modalRating').innerText = data.rating;
                     document.getElementById('modalDevs').innerText = data.devs;
+                    
+                    if (data.genres) {
+                        document.getElementById('modalGenres').style.display = "inline-flex";
+                        document.getElementById('modalGenres').innerText = data.genres;
+                    }
                     
                     if (data.price && data.price.final_formatted) {
                         priceBadge.style.display = "inline-flex";
