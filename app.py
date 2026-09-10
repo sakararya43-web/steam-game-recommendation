@@ -58,12 +58,11 @@ def get_library():
         return jsonify({"error": "No Steam ID provided"}), 400
     try:
         owned_games = steam_api.get_owned_games(steam_id)
-        # Limit to 20 for UI sake, and only games with playtime or names
         library = []
         if owned_games:
             # Sort by playtime_forever descending
             owned_games = sorted(owned_games, key=lambda x: x.get('playtime_forever', 0), reverse=True)
-            for g in owned_games[:20]:
+            for g in owned_games:
                 library.append({
                     "name": g.get('name', f"App {g.get('appid')}"),
                     "appId": g.get('appid')
