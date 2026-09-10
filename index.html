@@ -42,15 +42,15 @@
         .bg-slide:nth-child(4) { background-image: url('https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/367520/page_bg_generated_v6b.jpg'); animation-delay: 30s; }
 
         @keyframes fadeCycle {
-            0%, 20% { opacity: 0.5; }
+            0%, 20% { opacity: 1; }
             25%, 95% { opacity: 0; }
-            100% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
 
         /* Dark Overlay */
         .bg-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1;
-            background: radial-gradient(circle at center, rgba(5,15,20,0.85) 0%, rgba(0,0,0,0.98) 100%);
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none;
+            background: radial-gradient(circle at center, rgba(5,15,20,0.4) 0%, rgba(0,0,0,0.85) 100%);
         }
 
         /* Pixel Snow */
