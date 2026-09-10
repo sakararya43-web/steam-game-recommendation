@@ -1,4 +1,5 @@
 from flask import Flask, send_from_directory, request, jsonify
+from flask_cors import CORS
 import sys
 import os
 
@@ -9,6 +10,7 @@ from steam_api import SteamAPI
 
 ASSETS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets')
 app = Flask(__name__, static_url_path='/assets', static_folder=ASSETS_DIR)
+CORS(app)  # Enable CORS for Vercel
 
 # Initialize the recommender
 print("Loading ML model...")
