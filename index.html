@@ -422,6 +422,22 @@
 
     <script>
         const API_BASE = "https://steam-game-recommendation-2.onrender.com";
+
+        function handleImageError(img, appId) {
+            if (!img.dataset.retry) {
+                img.dataset.retry = "1";
+                img.src = `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${appId}/capsule_616x353.jpg`;
+            } else if (img.dataset.retry === "1") {
+                img.dataset.retry = "2";
+                img.src = `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${appId}/library_600x900.jpg`;
+            } else if (img.dataset.retry === "2") {
+                img.dataset.retry = "3";
+                img.src = `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${appId}/logo.png`;
+            } else {
+                img.onerror = null;
+                img.src = 'https://placehold.co/600x400/0a1e23/00e5ff?text=No+Image';
+            }
+        }
         let currentSteamId = "";
         let hlsPlayer = null;
 
@@ -556,7 +572,7 @@
             const imgUrl = `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${target.appId}/header.jpg`;
             const heroHtml = `
                 <div style="grid-column: 1 / -1; display: flex; background: var(--surface); border: 1px solid rgba(0, 229, 255, 0.2); border-radius: 12px; overflow: hidden; margin-bottom: 20px; align-items: center; cursor: pointer; transition: 0.3s;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='rgba(0, 229, 255, 0.2)'" onclick="openGameDetails('${target.name.replace(/'/g, "\'")}', '${target.appId}')">
-                    <img src="${imgUrl}" style="width: 250px; height: 100%; object-fit: cover;" onerror="this.onerror=null; this.src='https://placehold.co/600x400/0a1e23/00e5ff?text=No+Image'">
+                    <img src="${imgUrl}" style="width: 250px; height: 100%; object-fit: cover;" onerror="handleImageError(this, '${target.appId}')">
                     <div style="padding: 20px;">
                         <span style="color: var(--primary); font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Searched Game</span>
                         <h2 style="font-family: 'Poppins'; font-size: 1.8rem; margin: 5px 0;">${target.name}</h2>
@@ -585,7 +601,7 @@
                 contentHTML += `</div>`;
                 
                 card.innerHTML = `
-                    <img src="${imgUrl}" alt="${item.name}" onerror="this.onerror=null; this.src='https://placehold.co/600x400/0a1e23/00e5ff?text=No+Image'">
+                    <img src="${imgUrl}" alt="${item.name}" onerror="handleImageError(this, '${item.appId}')">
                     ${contentHTML}
                 `;
                 grid.appendChild(card);
@@ -597,7 +613,7 @@
             document.getElementById('modalTitle').innerText = name;
             const imgEl = document.getElementById('modalImg');
             imgEl.src = `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${appId}/header.jpg`;
-            imgEl.onerror = function() { this.onerror=null; this.src='https://placehold.co/600x400/0a1e23/00e5ff?text=No+Image'; };
+            imgEl.onerror = function() { handleImageError(this, appId); };
             imgEl.style.display = "block";
             
             const video = document.getElementById('modalVideo');
