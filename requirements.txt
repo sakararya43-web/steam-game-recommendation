@@ -6,4 +6,7 @@ scipy==1.18.1
 requests==2.34.2
 joblib==1.6.0
 python-dotenv==1.2.3
+nbformat==5.11.1
+jupyter==1.1.1
+waitress==3.0.2
 gunicorn
