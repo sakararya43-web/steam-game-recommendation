@@ -1,0 +1,7 @@
+app.py
+src/
+model/
+requirements.txt
+steam_recommender.ipynb
+README.md
+.env
