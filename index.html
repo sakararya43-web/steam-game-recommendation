@@ -420,6 +420,11 @@
         const API_BASE = "https://steam-game-recommendation-2.onrender.com";
 
         function handleImageError(img, appId) {
+            if (img.alt && img.alt.includes("Oblivion")) {
+                img.onerror = null;
+                img.src = 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/22330/header.jpg';
+                return;
+            }
             if (!img.dataset.retry) {
                 img.dataset.retry = "1";
                 img.src = `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${appId}/capsule_616x353.jpg`;
@@ -568,7 +573,7 @@
             const imgUrl = `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${target.appId}/header.jpg`;
             const heroHtml = `
                 <div style="grid-column: 1 / -1; display: flex; background: var(--surface); border: 1px solid rgba(255, 0, 60, 0.2); border-radius: 12px; overflow: hidden; margin-bottom: 20px; align-items: center; cursor: pointer; transition: 0.3s;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='rgba(255, 0, 60, 0.2)'" onclick="openGameDetails('${target.name.replace(/'/g, "\'")}', '${target.appId}')">
-                    <img src="${imgUrl}" style="width: 250px; height: 100%; object-fit: cover;" onerror="handleImageError(this, '${target.appId}')">
+                    <img src="${imgUrl}" alt="${target.name}" style="width: 250px; height: 100%; object-fit: cover;" onerror="handleImageError(this, '${target.appId}')">
                     <div style="padding: 20px;">
                         <span style="color: var(--primary); font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Searched Game</span>
                         <h2 style="font-family: 'Poppins'; font-size: 1.8rem; margin: 5px 0;">${target.name}</h2>
@@ -608,6 +613,7 @@
             const modal = document.getElementById('detailsModal');
             document.getElementById('modalTitle').innerText = name;
             const imgEl = document.getElementById('modalImg');
+            imgEl.alt = name;
             imgEl.src = `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${appId}/header.jpg`;
             imgEl.onerror = function() { handleImageError(this, appId); };
             imgEl.style.display = "block";
