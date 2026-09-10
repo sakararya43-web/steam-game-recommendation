@@ -200,7 +200,7 @@
             .modal-right { overflow-y: visible !important; }
         }
         .modal-left {
-            flex: 1.3; background: #000; position: relative; border-right: 1px solid rgba(255,255,255,0.05);
+            flex: 2; background: #000; position: relative; border-right: 1px solid rgba(255,255,255,0.05);
         }
         .modal-right {
             flex: 1; padding: 40px; display: flex; flex-direction: column; overflow-y: auto;
@@ -270,6 +270,8 @@
             font-family: 'Consolas', monospace; font-size: 0.85rem; color: #a0b6b8; line-height: 1.6;
             background: #050a0f; padding: 12px; border-radius: 8px; border: 1px solid #1a3035;
         }
+        .modal-sysreq-content ul { padding-left: 20px; margin: 10px 0; }
+        .modal-sysreq-content li { margin-bottom: 8px; }
 
         @keyframes shine { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -584,8 +586,8 @@
                     if (data.price && data.price.final_formatted) {
                         priceBadge.style.display = "inline-flex";
                         priceBadge.innerText = data.price.discount_percent > 0 
-                            ? `${data.price.final_formatted} (-${data.price.discount_percent}%)` 
-                            : data.price.final_formatted;
+                            ? `Price: ${data.price.final_formatted} (-${data.price.discount_percent}%)` 
+                            : `Price: ${data.price.final_formatted}`;
                     }
                     
                     if (data.movie) {

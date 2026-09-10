@@ -134,11 +134,15 @@ def get_game_details():
                 genres = ", ".join([g['description'] for g in data['genres']])
             
             # Fetch Price Overview
-            if 'price_overview' in data:
+            if data.get('is_free'):
+                price_overview = {"final_formatted": "Free", "discount_percent": 0}
+            elif 'price_overview' in data:
                 price_overview = {
                     "final_formatted": data['price_overview'].get('final_formatted', ''),
                     "discount_percent": data['price_overview'].get('discount_percent', 0)
                 }
+            else:
+                price_overview = {"final_formatted": "Price N/A", "discount_percent": 0}
             
             # Fetch Movie Trailer (HLS format preferred)
             movies = data.get('movies', [])
