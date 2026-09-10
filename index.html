@@ -367,7 +367,7 @@
             const grid = document.getElementById('mainGrid');
             grid.innerHTML = ""; loader.style.display = "block";
             try {
-                const res = await fetch('/api/popular');
+                const res = await fetch(API_BASE + '/api/popular');
                 const data = await res.json();
                 loader.style.display = "none";
                 if (data.recommendations) renderGrid(data.recommendations, false);
@@ -394,7 +394,7 @@
             grid.innerHTML = ""; loader.style.display = "block";
 
             try {
-                const res = await fetch(`/api/library?steamId=${input}`);
+                const res = await fetch(API_BASE + `/api/library?steamId=${input}`);
                 const data = await res.json();
                 loader.style.display = "none";
                 if (data.error) grid.innerHTML = `<p style="color:#00e5ff;">${data.error}</p>`;
@@ -421,7 +421,7 @@
             document.getElementById('gridTitle').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
             try {
-                const res = await fetch('/api/recommend', {
+                const res = await fetch(API_BASE + '/api/recommend', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ steamId: currentSteamId, gameQuery: query, appId: forcedAppId })
@@ -482,7 +482,7 @@
             };
 
             try {
-                const res = await fetch(`/api/game_details?appId=${appId}`);
+                const res = await fetch(API_BASE + `/api/game_details?appId=${appId}`);
                 const data = await res.json();
                 if (!data.error) {
                     document.getElementById('modalDesc').innerHTML = data.desc;
