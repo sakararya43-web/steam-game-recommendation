@@ -45,12 +45,12 @@
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; pointer-events: none; overflow: hidden;
         }
         .snowflake {
-            position: absolute; background: #ff4500; box-shadow: 0 0 10px #ff0000; border-radius: 50%;
-            animation: fall linear infinite; bottom: -10px;
+            position: absolute; background: #ff0000; box-shadow: 0 0 5px rgba(255,0,0,0.8);
+            animation: fall linear infinite; top: -10px;
         }
         @keyframes fall {
-            0% { transform: translateY(105vh) translateX(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-10px) translateX(40px) scale(0.2); opacity: 0; }
+            0% { transform: translateY(-10px) translateX(0); opacity: 1; }
+            100% { transform: translateY(105vh) translateX(30px); opacity: 0.2; }
         }
 
         nav {
