@@ -43,15 +43,23 @@ class GameRecommender:
             print(f"Error fetching live data for {app_id}: {e}")
             return None
 
-    def recommend_games(self, game_name, app_id=None, top_n=10, owned_games=None):
+    def recommend_games(self, game_name, app_id=None, top_n=20, owned_games=None):
         idx = None
         game_vector = None
+        target_info = None
         
         if game_name in self.indices:
             idx = self.indices[game_name]
             if isinstance(idx, pd.Series):
                 idx = idx.iloc[0]
             game_vector = self.tfidf_matrix[idx]
+            target_row = self.df.iloc[idx]
+            app_id = str(target_row['app_id'])
+            target_info = {
+                "name": target_row['name'],
+                "appId": app_id,
+                "desc": str(target_row['description'])
+            }
         else:
             matches = [name for name in self.indices.index if game_name.lower() in str(name).lower()]
             if matches:
@@ -59,6 +67,14 @@ class GameRecommender:
                 if isinstance(idx, pd.Series):
                     idx = idx.iloc[0]
                 game_vector = self.tfidf_matrix[idx]
+                target_row = self.df.iloc[idx]
+                app_id = str(target_row['app_id'])
+                game_name = target_row['name']
+                target_info = {
+                    "name": game_name,
+                    "appId": app_id,
+                    "desc": str(target_row['description'])
+                }
             else:
                 # If app_id not provided by frontend, try to search it!
                 if not app_id:
@@ -76,14 +92,31 @@ class GameRecommender:
                     combined_features = self.fetch_live_game_features(app_id)
                     if combined_features:
                         game_vector = self.tfidf.transform([combined_features])
+                        target_info = {
+                            "name": game_name,
+                            "appId": app_id,
+                            "desc": "Custom searched game not in database."
+                        }
                     else:
-                        return [f"Game '{game_name}' found, but failed to fetch live details from Steam."]
+                        return {"error": f"Game '{game_name}' found, but failed to fetch live details from Steam."}
                 else:
-                    return [f"Game '{game_name}' not found on Steam. Try another search."]
+                    return {"error": f"Game '{game_name}' not found on Steam. Try another search."}
             
         from sklearn.metrics.pairwise import cosine_similarity
         # Compute similarities against all games in our dataset
         sim_scores = cosine_similarity(game_vector, self.tfidf_matrix).flatten()
+        
+        # Boost sequels and related games
+        target_base = game_name.lower().split(':')[0].split('-')[0].strip()
+        if len(target_base) > 3:
+            for j in range(len(sim_scores)):
+                test_name = str(self.df.iloc[j]['name']).lower()
+                if test_name.startswith(target_base) and test_name != game_name.lower():
+                    sim_scores[j] += 0.35 # Massive boost for sequels
+        
+        # Add slight random noise to scores (0.0 to 0.04) to shuffle similar games (Diversity)
+        noise = np.random.uniform(0, 0.04, size=sim_scores.shape)
+        sim_scores += noise
         
         # Sort scores (highest to lowest)
         sim_indices = sim_scores.argsort()[::-1]
@@ -99,19 +132,24 @@ class GameRecommender:
             score = sim_scores[i]
             game_app_id = self.df.iloc[i]['app_id']
             
+            # Ensure we don't recommend the exact game we searched for (by app id)
             if game_app_id not in owned_app_ids and str(game_app_id) != str(app_id):
                 game_row = self.df.iloc[i]
+                
+                # Cap match at 99%
+                match_pct = min(int(score * 100), 99)
+                
                 recommendations.append({
                     "name": game_row['name'],
                     "appId": str(game_row['app_id']),
-                    "match": f"{int(score * 100)}%",
+                    "match": f"{match_pct}%",
                     "desc": str(game_row['description']),
                     "sysReq": "OS: Win 10 | CPU: i5 | RAM: 8GB | GPU: GTX 1060"
                 })
                 if len(recommendations) == top_n:
                     break
                     
-        return recommendations
+        return {"target": target_info, "recommendations": recommendations}
 
 if __name__ == "__main__":
     recommender = GameRecommender()

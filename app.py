@@ -43,13 +43,11 @@ def get_recommendations():
             print(f"Error fetching steam games for {steam_id}: {e}")
             
     try:
-        recommendations = recommender.recommend_games(game_query, app_id=app_id, top_n=10, owned_games=owned_games)
+        response_data = recommender.recommend_games(game_query, app_id=app_id, top_n=20, owned_games=owned_games)
+        if isinstance(response_data, dict) and "error" in response_data:
+            return jsonify({"error": response_data["error"]})
         
-        # If the game wasn't found, recommendations might return a list of strings
-        if recommendations and isinstance(recommendations[0], str):
-            return jsonify({"error": recommendations[0]}), 404
-            
-        return jsonify({"recommendations": recommendations})
+        return jsonify(response_data)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -77,10 +75,12 @@ def get_library():
 @app.route('/api/popular', methods=['GET'])
 def get_popular():
     try:
-        # Just return the first 10 games from our dataset as 'popular'
-        top_10 = recommender.df.head(10)
+        import random
+        # Take the top 150 games and randomly pick 20
+        top_games = recommender.df.head(150)
+        sampled = top_games.sample(n=20)
         res = []
-        for _, row in top_10.iterrows():
+        for _, row in sampled.iterrows():
             res.append({
                 "name": row['name'],
                 "appId": str(row['app_id']),
@@ -120,6 +120,8 @@ def get_game_details():
         req_min = "System requirements not specified."
         desc = "No description available."
         devs = "Unknown"
+        price_overview = None
+        movie = None
         
         if res_steam and str(app_id) in res_steam and res_steam[str(app_id)]['success']:
             data = res_steam[str(app_id)]['data']
@@ -129,6 +131,19 @@ def get_game_details():
             desc = data.get('short_description', desc)
             devs = ", ".join(data.get('developers', []))
             
+            # Fetch Price Overview
+            if 'price_overview' in data:
+                price_overview = {
+                    "final_formatted": data['price_overview'].get('final_formatted', ''),
+                    "discount_percent": data['price_overview'].get('discount_percent', 0)
+                }
+            
+            # Fetch Movie Trailer (HLS format preferred)
+            movies = data.get('movies', [])
+            if movies and len(movies) > 0:
+                m = movies[0]
+                movie = m.get('hls_h264') or m.get('dash_h264') or m.get('webm', {}).get('max')
+                
         rating = "No rating data"
         if res_spy:
             pos = res_spy.get('positive', 0)
@@ -140,7 +155,9 @@ def get_game_details():
             "sysReq": req_min,
             "desc": desc,
             "rating": rating,
-            "devs": devs
+            "devs": devs,
+            "price": price_overview,
+            "movie": movie
         })
     except Exception as e:
         print(f"Error fetching game details: {e}")
