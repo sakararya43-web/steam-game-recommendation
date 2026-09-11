@@ -522,6 +522,7 @@
             closeLoginModal();
             
             document.getElementById('gridTitle').innerText = "Your Library";
+            document.getElementById('backBtn').style.display = 'flex';
             const loader = document.getElementById('loader');
             const grid = document.getElementById('mainGrid');
             grid.innerHTML = ""; loader.style.display = "block";
@@ -546,6 +547,7 @@
             if (forcedQuery) document.getElementById('gameQuery').value = forcedQuery;
 
             document.getElementById('gridTitle').innerText = `Recommendations for "${query}"`;
+            document.getElementById('backBtn').style.display = 'flex';
             const loader = document.getElementById('loader');
             const grid = document.getElementById('mainGrid');
             grid.innerHTML = ""; loader.style.display = "block";
