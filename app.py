@@ -21,6 +21,11 @@ steam_api = SteamAPI()
 @app.route('/')
 def index():
     return send_from_directory(os.path.dirname(os.path.abspath(__file__)), 'index.html')
+@app.route('/ping', methods=['GET'])
+def ping():
+    return jsonify({"status": "awake"}), 200
+
+
 
 @app.route('/api/recommend', methods=['POST'])
 def get_recommendations():
