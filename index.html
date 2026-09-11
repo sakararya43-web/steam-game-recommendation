@@ -94,9 +94,9 @@
         #userStatus { font-weight: 600; color: var(--primary); font-size: 0.95rem; }
 
         .login-btn-nav {
-            background: linear-gradient(135deg, #171a21, #2a475e);
-            border: 1px solid #66c0f4;
-            color: #66c0f4;
+            background: var(--btn-grad);
+            border: 1px solid var(--primary);
+            color: white;
             padding: 8px 18px;
             border-radius: 8px;
             font-family: 'Inter', sans-serif;
@@ -107,13 +107,13 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 4px 10px rgba(255, 0, 60, 0.4);
         }
         .login-btn-nav:hover {
-            background: linear-gradient(135deg, #2a475e, #66c0f4);
+            background: linear-gradient(135deg, #ff003c 0%, #660000 100%);
             color: white;
             border-color: transparent;
-            box-shadow: 0 6px 15px rgba(102, 192, 244, 0.5);
+            box-shadow: 0 6px 15px rgba(255, 0, 60, 0.5);
             transform: translateY(-2px);
         }
 
@@ -321,7 +321,11 @@
             <svg viewBox="0 0 24 24"><path d="M11.979 0C5.353 0 0 5.373 0 12c0 4.148 2.115 7.828 5.342 10.024l3.411-4.908c-.062-.266-.101-.54-.101-.826 0-1.928 1.563-3.491 3.491-3.491.564 0 1.096.142 1.565.385l2.42-3.46c-.033-.189-.053-.383-.053-.584 0-1.928 1.563-3.491 3.491-3.491 1.929 0 3.492 1.563 3.492 3.491 0 1.929-1.563 3.492-3.492 3.492-1.85 0-3.366-1.442-3.483-3.264l-2.43 3.473c.184.441.288.927.288 1.439 0 1.928-1.563 3.491-3.491 3.491-1.929 0-3.492-1.563-3.492-3.491 0-.616.16-1.196.442-1.706l-3.328-4.786C1.728 12.396 1.728 12.203 1.728 12c0-5.656 4.595-10.251 10.251-10.251 5.656 0 10.251 4.595 10.251 10.251 0 5.656-4.595 10.251-10.251 10.251-.762 0-1.503-.085-2.22-.24l1.326-1.908c.287.051.585.078.894.078 4.704 0 8.523-3.819 8.523-8.523S16.683 3.477 11.979 3.477z"/></svg>
             Nexus
         </div>
-        <div class="nav-actions">
+                  <div class="nav-actions">
+              <button id="backBtn" onclick="goHome()" style="background: rgba(0,0,0,0.5); border: 1px solid var(--primary); color: var(--primary); padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; margin-right: 15px; display: none; align-items: center; gap: 6px; transition: all 0.3s; backdrop-filter: blur(4px);">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                  Back
+              </button>
             <span id="userStatus" style="color: #a0b6b8; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; font-weight: 500;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                 Guest Mode
