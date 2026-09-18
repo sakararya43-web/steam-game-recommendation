@@ -5,6 +5,23 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class SteamAPI:
+
+    def resolve_vanity_url(self, vanity_name):
+        url = "http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/"
+        params = {
+            'key': self.api_key,
+            'vanityurl': vanity_name
+        }
+        try:
+            res = requests.get(url, params=params)
+            if res.status_code == 200:
+                data = res.json()
+                if data.get('response', {}).get('success') == 1:
+                    return data['response']['steamid']
+        except Exception:
+            pass
+        return None
+
     def __init__(self):
         self.api_key = os.getenv('STEAM_API_KEY')
         if not self.api_key:

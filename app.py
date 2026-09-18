@@ -62,6 +62,12 @@ def get_library():
     if not steam_id:
         return jsonify({"error": "No Steam ID provided"}), 400
     try:
+        # If it's not a 17-digit number, try to resolve it as a custom URL/username
+        if not (steam_id.isdigit() and len(steam_id) == 17):
+            resolved_id = steam_api.resolve_vanity_url(steam_id)
+            if resolved_id:
+                steam_id = resolved_id
+            
         owned_games = steam_api.get_owned_games(steam_id)
         library = []
         if owned_games:
