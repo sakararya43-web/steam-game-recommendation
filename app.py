@@ -134,8 +134,11 @@ def get_game_details():
         price_overview = None
         movie = None
         
-        if res_steam and str(app_id) in res_steam and res_steam[str(app_id)]['success']:
-            data = res_steam[str(app_id)]['data']
+        if res_steam:
+            # Steam sometimes returns a different key for bundled/upgraded games (e.g. Witcher 3 returns 1233340 instead of 292030)
+            first_key = list(res_steam.keys())[0]
+            if res_steam[first_key].get('success'):
+                data = res_steam[first_key]['data']
             sys_req = data.get('pc_requirements', {})
             if isinstance(sys_req, dict) and 'minimum' in sys_req:
                 req_min = sys_req['minimum']
