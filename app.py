@@ -117,9 +117,13 @@ def get_game_details():
         
         def fetch_url(url):
             try:
-                return requests.get(url, timeout=5).json()
-            except Exception:
-                return None
+                headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
+                res = requests.get(url, headers=headers, timeout=8)
+                if res.status_code == 200:
+                    return res.json()
+            except Exception as e:
+                pass
+            return None
                 
         with ThreadPoolExecutor(max_workers=2) as executor:
             future_steam = executor.submit(fetch_url, url_steam)
@@ -134,32 +138,29 @@ def get_game_details():
         price_overview = None
         movie = None
         
-        if res_steam:
-            # Steam sometimes returns a different key for bundled/upgraded games (e.g. Witcher 3 returns 1233340 instead of 292030)
+        if res_steam and len(res_steam.keys()) > 0:
             first_key = list(res_steam.keys())[0]
             if res_steam[first_key].get('success'):
                 data = res_steam[first_key]['data']
-            sys_req = data.get('pc_requirements', {})
-            if isinstance(sys_req, dict) and 'minimum' in sys_req:
-                req_min = sys_req['minimum']
-            desc = data.get('short_description', desc)
-            devs = ", ".join(data.get('developers', []))
-            if 'genres' in data:
-                genres = ", ".join([g['description'] for g in data['genres']])
-            
-            # Fetch Price Overview
-            if data.get('is_free'):
-                price_overview = {"final_formatted": "Free", "discount_percent": 0}
-            elif 'price_overview' in data:
-                price_overview = {
-                    "final_formatted": data['price_overview'].get('final_formatted', ''),
-                    "discount_percent": data['price_overview'].get('discount_percent', 0)
-                }
-            else:
-                price_overview = {"final_formatted": "Price N/A", "discount_percent": 0}
-            
-            # Fetch Movie Trailer (HLS format preferred)
-            movies = data.get('movies', [])
+                sys_req = data.get('pc_requirements', {})
+                if isinstance(sys_req, dict) and 'minimum' in sys_req:
+                    req_min = sys_req['minimum']
+                desc = data.get('short_description', desc)
+                devs = ", ".join(data.get('developers', []))
+                if 'genres' in data:
+                    genres = ", ".join([g['description'] for g in data['genres']])
+                
+                if data.get('is_free'):
+                    price_overview = {"final_formatted": "Free", "discount_percent": 0}
+                elif 'price_overview' in data:
+                    price_overview = {
+                        "final_formatted": data['price_overview'].get('final_formatted', ''),
+                        "discount_percent": data['price_overview'].get('discount_percent', 0)
+                    }
+                else:
+                    price_overview = {"final_formatted": "Price N/A", "discount_percent": 0}
+                
+                movies = data.get('movies', [])
             if movies and len(movies) > 0:
                 m = movies[0]
                 movie = m.get('hls_h264') or m.get('dash_h264') or m.get('webm', {}).get('max')
