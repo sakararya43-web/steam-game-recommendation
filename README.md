@@ -1,6 +1,7 @@
 # 🎮 Steam Game Recommender
 
-![Steam Game Recommender](assets/bg.png)
+<img width="1892" height="998" alt="image" src="https://github.com/user-attachments/assets/8e8945d0-cb53-4bab-b1f4-08e083dd4f97" />
+
 
 An AI-powered, full-stack web application that uses Machine Learning to analyze your Steam library and intelligently recommend your next gaming obsession. 
 
